@@ -1,0 +1,27 @@
+{
+  "name": "somesession",
+  "license": "BSD-3-Clause",
+  "version": "0.0.1",
+  "dependencies": {
+    "wraplog": "^0.0.2"
+  },
+  "devDependencies": {
+    "aerospike-session-store": "latest",
+    "cassandra-store": "latest",
+    "connect-memcached": "latest",
+    "connect-mongodb-session": "latest",
+    "express-mysql-session": "latest",
+    "connect-pg-simple": "latest",
+    "connect-redis": "latest",
+    "connect-sqlite3": "latest"
+  },
+  "description": "Express.js sessions store abstraction library",
+  "engines": {
+    "node": "6.9.1"
+  },
+  "repository": "https://github.com/faust64/logger",
+  "scripts": {
+    "release": "npm login && git push -u origin master && npm publish",
+    "test": "make test"
+  }
+}
