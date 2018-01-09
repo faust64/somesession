@@ -3,112 +3,116 @@
 const logger = require('wraplog')('sessions-store');
 
 class sessionStore {
-    constructor (driver, session) {
+    constructor (opts, session) {
 	try {
-	    driver = driver || { name: 'sqlite' };
-	    let sessionStore = storeOptions = false;
-	    if (driver.name === undefined || driver.name === 'sqlite') {
+	    opts = opts || { driver: 'sqlite' };
+	    let sessionStore = false;
+	    let storeOptions = false;
+	    if (opts.remoteArray === undefined) {
+		if (opts.host !== undefined) { opts.remoteArray = [ opts.host ]; }
+		else { opts.remoteArray = [ '127.0.0.1' ]; }
+	    }
+	    if (opts.driver === undefined || opts.driver === 'sqlite') {
 		sessionStore = require('connect-sqlite3')(session);
 		storeOptions = {
-			db: driver.database || 'default.sqlite',
-			dir: driver.path || './',
-			table: driver.table || 'sessions'
+			db: opts.database || 'test.sqlite',
+			dir: opts.path || './',
+			table: opts.table || 'sessions'
 		    };
-	    } else if (driver.name === 'cassandra') {
-		sessionStore = require('cassandra-store')(session);
+	    } else if (opts.driver === 'cassandra') {
+		sessionStore = require('cassandra-session-store');
 		storeOptions = {
-			client: null,
 			clientOptions: {
-				contactPoints: driver.remoteArray,
-				keyspace: driver.keyspace || 'test',
+				contactPoints: opts.remoteArray,
+				keyspace: opts.database || 'sessions',
 				queryOptions: { prepare: true }
 			    },
-			table: driver.table || 'sessions'
+			table: opts.table || 'sessions'
 		    };
-	    } else if (driver.name === 'memcached') {
+	    } else if (opts.driver === 'memcached') {
 		sessionStore = require('connect-memcached')(session);
 		storeOptions = {
-			hosts: driver.remoteArray || [ '127.0.0.1' ],
-			prefix: driver.prefix || 'sessions:',
-			ttl: driver.expiration || 86400
+			hosts: opts.remoteArray || [ '127.0.0.1' ],
+			prefix: opts.prefix || 'sessions:',
+			ttl: opts.expiration || 86400
 		    };
-		if (driver.secret !== undefined) { storeOptions.secret = driver.secret; }
-	    } else if (driver.name === 'mongodb') {
+		if (opts.secret !== undefined) { storeOptions.secret = opts.secret; }
+	    } else if (opts.driver === 'mongodb') {
 		sessionStore = require('connect-mongodb-session')(session);
-		driver.remote = driver.remote || '127.0.0.1';
-		driver.port = driver.port || 27000;
-		driver.database = driver.database || 'session';
+		opts.host = opts.host || '127.0.0.1';
+		opts.port = opts.port || 27000;
+		opts.database = opts.database || 'sessions';
 		storeOptions = {
-			collection: driver.table || 'sessions',
-			expires: driver.expiration || 86400,
-			ttl: driver.expiration || 86400,
-			uri: `mongodb://${driver.remote}:${driver.port}/${driver.database}`
+			collection: opts.table || 'sessions',
+			expires: opts.expiration || 86400,
+			ttl: opts.expiration || 86400,
+			uri: `mongodb://${opts.host}:${opts.port}/${opts.database}`
 		   };
-	    } else if (driver.name === 'mysql') {
+	    } else if (opts.driver === 'mysql') {
 		sessionStore = require('express-mysql-session')(session);
 		storeOptions = {
-			connectionLimit: driver.connectionLimit || 5,
-			createDatabaseTable: driver.createTable || true,
-			database: driver.database || 'sessions',
-			expiration: driver.expiration || 86400,
-			host: driver.remote || 'localhost',
-			port: driver.port || 3306,
-			schema: { tableName: driver.table || 'sessione' }
+			connectionLimit: opts.connectionLimit || 5,
+			createDatabaseTable: opts.createTable || true,
+			database: opts.database || 'sessions',
+			expiration: opts.expiration || 86400,
+			host: opts.host || 'localhost',
+			port: opts.port || 3306,
+			schema: { tableName: opts.table || 'sessions' }
 		};
-		if (driver.username !== undefined) { storeOptions.user = driver.username; }
-		if (driver.password !== undefined) { storeOptions.password = driver.password; }
-	    } else if (driver.name === 'postgres') {
+		if (opts.username !== undefined) { storeOptions.user = opts.username; }
+		if (opts.password !== undefined) { storeOptions.password = opts.password; }
+	    } else if (opts.driver === 'postgres') {
 		sessionStore = require('connect-pg-simple')(session);
-		driver.remote = driver.remote || '127.0.0.1';
-		driver.port = driver.port || 5432;
-		driver.database = driver.database || 'session';
-		if (driver.authstr === undefined) {
-		    if (driver.password !== undefined && driver.username !== undefined) {
-			driver.authstr = `${driver.username}:${driver.password}@`;
-		    } else if (driver.username !== undefined) {
-			driver.authstr = `${driver.username}:@`;
-		    }
+		opts.host = opts.host || '127.0.0.1';
+		opts.port = opts.port || 5432;
+		opts.database = opts.database || 'sessions';
+		if (opts.authstr === undefined) {
+		    if (opts.password !== undefined && opts.username !== undefined) {
+			opts.authstr = `${opts.username}:${opts.password}@`;
+		    } else if (opts.username !== undefined) {
+			opts.authstr = `${opts.username}:@`;
+		    } else { opts.authstr = ''; }
 		}
 		storeOptions = {
-			connString: `postgresql://${driver.authstr}${driver.host}:${driver.port}/${driver.database}`,
-			tableName: driver.table || 'sessions',
-			ttl: driver.expiration || 86400,
+			conString: `postgresql://${opts.authstr}${opts.host}:${opts.port}/${opts.database}`,
+			tableName: opts.table || 'sessions', //!!singular
+			ttl: opts.expiration || 86400,
 		    };
-	    } else if (driver.name === 'redis') {
+	    } else if (opts.driver === 'redis') {
 		sessionStore = require('connect-redis')(session);
 		storeOptions = {
-			db: driver.database || 0,
-			host: driver.host || '127.0.0.1',
-			port: driver.port || 6379,
-			prefix: driver.prefix || 'sessions:',
-			ttl: driver.expiration || 86400,
+			db: opts.database || 0,
+			host: opts.host || '127.0.0.1',
+			port: opts.port || 6379,
+			prefix: opts.prefix || 'sessions:',
+			ttl: opts.expiration || 86400,
 			logErrors: logger.error
 		    };
-		if (driver.password !== undefined) { storeOptions.auth_pass = driver.password; }
-	    } else if (driver.name === 'aerospike') {
+		if (opts.password !== undefined) { storeOptions.auth_pass = opts.password; }
+	    } else if (opts.driver === 'aerospike') {
 		sessionStore = require('aerospike-session-store')(session);
-		if (driver.remoteArray !== undefined) {
-		    driver.remote = driver.remoteArray.join(',');
-		}
+		opts.host = opts.remoteArray.join(',');
 		storeOptions = {
-			namespace: driver.database || 'sessions',
-			set: driver.table || 'sessions',
-			ttl: driver.expiration || 86400,
-			hosts: driver.remote || '127.0.0.1:3000'
+			namespace: opts.database || 'sessions',
+			set: opts.table || 'sessions',
+			ttl: opts.expiration || 86400,
+			hosts: opts.host || '127.0.0.1:3000'
 		    };
-	    } else { throw new Error('unhandled driver', driver); }
+	    } else { throw new Error('unhandled opts', opts); }
 	    this._sessionStore = new sessionStore(storeOptions);
 	    this._sessionStore.on('error', (e) => {
 		    logger.error('caught:', JSON.stringify(e || 'undefined error'));
 		});
+	    logger.info(`${opts.driver} connector instantiated`);
 	} catch(e) {
-	    logger.error('failed initializing session store with' + JSON.stringify(e || 'undefined error'));
+	    logger.error('failed initializing session store with', e !== undefined ? JSON.stringify(e) : 'undefined error');
+	    process.exit(1);
 	}
     }
 
     get sessionStoreInstance() {
-	return new this._db;
+	return this._sessionStore;
     }
 }
 
-module.exports = (driver, session) => new sessionStore(driver, session).sessionStoreInstance;
+module.exports = (opts, session) => new sessionStore(opts, session).sessionStoreInstance;

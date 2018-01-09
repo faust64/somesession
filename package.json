@@ -7,13 +7,18 @@
   },
   "devDependencies": {
     "aerospike-session-store": "latest",
-    "cassandra-store": "latest",
+    "axios": "latest",
+    "body-parser": "latest",
+    "cassandra-session-store": "latest",
     "connect-memcached": "latest",
     "connect-mongodb-session": "latest",
-    "express-mysql-session": "latest",
     "connect-pg-simple": "latest",
     "connect-redis": "latest",
-    "connect-sqlite3": "latest"
+    "connect-sqlite3": "latest",
+    "express": "latest",
+    "express-session": "latest",
+    "express-mysql-session": "latest",
+    "mocha": "4.1.0"
   },
   "description": "Express.js sessions store abstraction library",
   "engines": {
