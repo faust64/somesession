@@ -151,7 +151,7 @@ prep-test-postgres:
 	fi
 
 prep-test-redis:
-	if test "$$TEST_REDIS"; then \
+	@@if test "$$TEST_REDIS"; then \
 	    return 0; \
 	fi; \
 	if test -z "$$REDIS_HOST"; then \
