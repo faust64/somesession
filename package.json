@@ -8,6 +8,7 @@
   "devDependencies": {
     "aerospike-session-store": "latest",
     "axios": "latest",
+    "bluebird": "latest",
     "body-parser": "latest",
     "cassandra-session-store": "latest",
     "connect-memcached": "latest",
