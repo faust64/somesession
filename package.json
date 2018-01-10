@@ -17,17 +17,17 @@
     "connect-redis": "latest",
     "connect-sqlite3": "latest",
     "express": "latest",
-    "express-session": "latest",
     "express-mysql-session": "latest",
+    "express-session": "latest",
     "mocha": "4.1.0"
   },
   "description": "Express.js sessions store abstraction library",
   "engines": {
     "node": "6.9.1"
   },
-  "repository": "https://github.com/faust64/logger",
+  "repository": "https://github.com/faust64/somesession",
   "scripts": {
-    "release": "npm login && git push -u origin master && npm publish",
+    "release": "(npm whoami | grep '^Not authed' >/dev/null && npm login) ; npm whoami | grep '^Not authed' >/dev/null && echo 'login to npm required' >&2 && exit 1 ; git push -u origin master && npm publish",
     "test": "make test"
   }
 }
