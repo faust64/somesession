@@ -23,7 +23,7 @@
   },
   "description": "Express.js sessions store abstraction library",
   "engines": {
-    "node": "6.9.1"
+    "node": "8.11.2"
   },
   "repository": "https://github.com/faust64/somesession",
   "scripts": {
