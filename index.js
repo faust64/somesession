@@ -105,7 +105,8 @@ class sessionStore {
 		});
 	    logger.info(`${opts.driver} connector instantiated`);
 	} catch(e) {
-	    logger.error('failed initializing session store with', e !== undefined ? JSON.stringify(e) : 'undefined error');
+	    logger.error('failed initializing session store with:');
+	    logger.error(e || 'undefined error');
 	    process.exit(1);
 	}
     }
