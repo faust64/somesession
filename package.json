@@ -3,7 +3,7 @@
   "license": "BSD-3-Clause",
   "version": "0.0.1",
   "dependencies": {
-    "wraplog": "^0.0.2"
+    "wraplog": "^0.0.5"
   },
   "devDependencies": {
     "aerospike-session-store": "latest",
