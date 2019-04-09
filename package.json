@@ -19,7 +19,7 @@
     "express": "latest",
     "express-mysql-session": "latest",
     "express-session": "latest",
-    "mocha": "5.2.0"
+    "mocha": "6.1.2"
   },
   "description": "Express.js sessions store abstraction library",
   "engines": {
